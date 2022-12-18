@@ -85,7 +85,6 @@ py::tuple optimizeEssentialMatrix(py::array_t<double>  correspondences_,
     double *ptr2 = (double *)buf2.ptr;
     for (size_t i = 0; i < 9; i++)
         ptr2[i] = E[i];
-    //std::cout<<E_<<std::endl;
     return py::make_tuple(E_,inliers_);//
 }
 

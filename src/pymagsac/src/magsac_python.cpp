@@ -12,7 +12,7 @@
 #include "samplers/importance_sampler.h"
 #include "samplers/uniform_sampler.h"
 #include "samplers/prosac_sampler.h"
-#include "samplers/gumbel1.h"
+#include "samplers/gumbel_softmax_sampler.h"
 #include <thread>
 
 #include <gflags/gflags.h>
@@ -21,7 +21,6 @@
 
 void optimizeEssentialMatrix_(
 std::vector<double> &correspondences,
-//std::vector<double>& dstPts,
 std::vector<double>& src_K,
 std::vector<double>& dst_K,
 std::vector<size_t>& inliers_,
@@ -36,9 +35,7 @@ std::vector<double>&E, double threshold, double estimated_score
 	
 	gcransac::EssentialMatrix model;
 	model.descriptor.resize(3,3);
-	//model.descriptor = estimated_model;
-	//std::cout<<"points"<<points<<std::endl;
-	//Eigen::Matrix3d estimated_model;
+
 	for (size_t i = 0; i < 3; ++i) {
 		for (size_t j = 0; j < 3;++j) {
 			model.descriptor(j, i) = best_model[i * 3 + j];
@@ -47,8 +44,6 @@ std::vector<double>&E, double threshold, double estimated_score
 	}
 	
 	std::vector<gcransac::Model> models = {model};
-	
-	//std::cout<<"input best modddddddel sizzze"<<models.size()<<std::endl;
 
 	Eigen::Matrix3d intrinsics_src,
 		intrinsics_dst;
@@ -67,36 +62,25 @@ std::vector<double>&E, double threshold, double estimated_score
 
 	gcransac::utils::DefaultEssentialMatrixEstimator estimator(intrinsics_src,
 		intrinsics_dst);
-	//fprintf(inliers_);
-	//std::cout<<"inliers in cpp:"<<std::endl;
-	//for (int    i=0;i<inliers_.size();i++)
-	//{
-	
-	 //  std::cout<<inliers_[i]<<std::endl;
-	//}
-	//std::cout<<"inliers end"<<std::endl;
-		
+
 	gcransac::estimator::solver::EssentialMatrixBundleAdjustmentSolver bundleOptimizer;
 	bundleOptimizer.estimateModel(
 		points,
 		&inliers_[0],
 		inliers_.size(),
 		models);
-	
-	//std::cout<<"models after BA:"<<models.size()<<std::endl;
-	//fprintf(inliers_.size());
+
 	const double &fx1 = intrinsics_src(0, 0);
 	const double &fy1 = intrinsics_src(1, 1);
 	const double &fx2 = intrinsics_dst(0, 0);
 	const double &fy2 = intrinsics_dst(1, 1);
 
 	const double threshold_normalizer = (fx1 + fx2 + fy1 + fy2) / 4.0;
-	//std::cout<<fx1<<fx2<<fy1<<fy2<<std::endl;
-	// The truncated least-squares threshold
+
 	const double truncated_threshold =  3.0/2.0 *threshold / threshold_normalizer;
-	// The squared least-squares threshold
+
 	const double squared_truncated_threshold = truncated_threshold * truncated_threshold;
-	//std::cout<<"threshold:"<<threshold_normalizer<<threshold<<squared_truncated_threshold<<std::endl;
+
 	// Scoring function
 	gcransac::MSACScoringFunction<gcransac::utils::DefaultEssentialMatrixEstimator> scoring;
 	scoring.initialize(squared_truncated_threshold, points.rows);
@@ -105,36 +89,20 @@ std::vector<double>&E, double threshold, double estimated_score
 	// Inliers of the new model
 	std::vector<size_t> inliers;
 	
-	//gcransac::EssentialMatrix model;
-	//mo//del.descriptor.resize(3,3);
-	//model.descriptor = estimated_model;
-	
-	//model.descriptor = Eigen::Matrix3d::Identity();
 	// Select the best model and update the inliers
 	for (auto& tmp_model : models)
 	{
 		inliers.clear();
-		//std::cout<<points<<std::endl;
-		//std::cout<<"model"<<tmp_model.descriptor<<std::endl;
 		score = scoring.getScore(points, // All points
 		tmp_model,// The current model parameters
 		estimator,// The estimator 
 		squared_truncated_threshold, // The current threshold
 		inliers); // The current inlier set
-		//for (int i = 0; i < 3; i++) {
-		//	for (int j = 0; j < 3; j++) {
-		//		std::cout<<"check"<<std::endl;
-		//		std::cout<<"tmp model "<<tmp_model.descriptor(i, j)<<std::endl;
-		//		}
-		//	}
 		
-		//std::cout<<"score"<<score.value<<std::endl;
-		//std::cout<<"estimated_score"<<score.value<<std::endl;
-		//std::cout<<"next model"<<std::endl;
 		// Check if the updated model is better than the best so far
 		if (estimated_score < score.value)
 		{
-			//std::cout<<"find a better"<<std::endl;
+
 			model.descriptor = tmp_model.descriptor;
 			estimated_score = score.value;
 			inliers_.swap(inliers);
@@ -155,16 +123,15 @@ std::vector<double>&E, double threshold, double estimated_score
 	}
 
 	E.resize(9);
-	//ssstd::cout<<"E before filling"<<E<<std::endl;
+
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			//std::cout<<"from model to E"<<i * 3 + j<<model.descriptor(i, j)<<std::endl;
+
 			E[i * 3 + j] = (double)model.descriptor(i, j);
-			//std::cout<<"E"<<i * 3 + j<<E[i * 3 + j]<<std::endl;
+
 		}
 	}
 	
-	//std::cout<<"_____"<<std::endl;
 	
 }
 
