@@ -147,20 +147,20 @@ int main(int argc, char** argv)
 		case 1:
 			LOG(INFO) << "Running fundamental matrix estimation examples.";
 
-			// Run fundamental matrix estimation on the kusvod2 dataset
-			runTest(SceneType::FundamentalMatrixScene, Dataset::kusvod2, ransac_confidence, FLAGS_draw_results, drawing_threshold_fundamental_matrix);
-
-			// Run fundamental matrix estimation on the AdelaideRMF dataset
-			runTest(SceneType::FundamentalMatrixScene, Dataset::adelaidermf, ransac_confidence, FLAGS_draw_results, drawing_threshold_fundamental_matrix);
-
-			// Run fundamental matrix estimation on the Multi-H dataset
-			runTest(SceneType::FundamentalMatrixScene, Dataset::multih, ransac_confidence, FLAGS_draw_results, drawing_threshold_fundamental_matrix);
+			//// Run fundamental matrix estimation on the kusvod2 dataset
+			//runTest(SceneType::FundamentalMatrixScene, Dataset::kusvod2, ransac_confidence, FLAGS_draw_results, drawing_threshold_fundamental_matrix);
+//
+			//// Run fundamental matrix estimation on the AdelaideRMF dataset
+			//runTest(SceneType::FundamentalMatrixScene, Dataset::adelaidermf, ransac_confidence, FLAGS_draw_results, drawing_threshold_fundamental_matrix);
+//
+			//// Run fundamental matrix estimation on the Multi-H dataset
+			//runTest(SceneType::FundamentalMatrixScene, Dataset::multih, ransac_confidence, FLAGS_draw_results, drawing_threshold_fundamental_matrix);
 			break;
 		case 2:
 			LOG(INFO) << "Running essential matrix estimation examples.";
 
 			// Run essential matrix estimation on a scene from the strecha dataset
-			runTest(SceneType::EssentialMatrixScene, Dataset::strecha, ransac_confidence, FLAGS_draw_results, drawing_threshold_essential_matrix);
+			//runTest(SceneType::EssentialMatrixScene, Dataset::strecha, ransac_confidence, FLAGS_draw_results, drawing_threshold_essential_matrix);
 			break;
 		default:
 			LOG(ERROR) << "Problem type " << FLAGS_problem_type << " is unknown. Valid values are 0,1,2.";
@@ -198,56 +198,56 @@ void runTest(SceneType scene_type_, // The type of the fitting problem
 		{
 			// Apply the homography estimation method built into OpenCV
 			LOG(INFO) << "1. Running OpenCV's RANSAC with threshold " << drawing_threshold_ << " px";
-			opencvHomographyFitting(ransac_confidence_,
-				drawing_threshold_, // The maximum sigma value allowed in MAGSAC
-				scene, // The scene type
-				false, // A flag to draw and show the results
-				false); // A flag to apply the MAGSAC post-processing to the OpenCV's output
+			// opencvHomographyFitting(ransac_confidence_,
+			// 	drawing_threshold_, // The maximum sigma value allowed in MAGSAC
+			// 	scene, // The scene type
+			// 	false, // A flag to draw and show the results
+			// 	false); // A flag to apply the MAGSAC post-processing to the OpenCV's output
 			
-			// Apply MAGSAC with maximum threshold set to a fairly high value
-			LOG(INFO) << "2. Running MAGSAC with fairly high maximum threshold (" << 50 << " px)";
-			testHomographyFitting(ransac_confidence_,
-				50.0, // The maximum sigma value allowed in MAGSAC
-				scene, // The scene type
-				false, // MAGSAC should be used
-				draw_results_, // A flag to draw and show the results  
-				2.5); // The inlier threshold for visualization.
+			// // Apply MAGSAC with maximum threshold set to a fairly high value
+			// LOG(INFO) << "2. Running MAGSAC with fairly high maximum threshold (" << 50 << " px)";
+			// testHomographyFitting(ransac_confidence_,
+			// 	50.0, // The maximum sigma value allowed in MAGSAC
+			// 	scene, // The scene type
+			// 	false, // MAGSAC should be used
+			// 	draw_results_, // A flag to draw and show the results  
+			// 	2.5); // The inlier threshold for visualization.
 			
 			// Apply MAGSAC with maximum threshold set to a fairly high value
 			LOG(INFO) << "3. Running MAGSAC++ with fairly high maximum threshold (" << 50 << " px)";
-			testHomographyFitting(ransac_confidence_,
-				50.0, // The maximum sigma value allowed in MAGSAC
-				scene, // The scene type
-				true, // MAGSAC++ should be used
-				draw_results_, // A flag to draw and show the results  
-				2.5); // The inlier threshold for visualization.
+			// testHomographyFitting(ransac_confidence_,
+			// 	50.0, // The maximum sigma value allowed in MAGSAC
+			// 	scene, // The scene type
+			// 	true, // MAGSAC++ should be used
+			// 	draw_results_, // A flag to draw and show the results  
+			// 	2.5); // The inlier threshold for visualization.
 		} else if (scene_type_ == SceneType::FundamentalMatrixScene)
 		{
 			// Apply the homography estimation method built into OpenCV
-			LOG(INFO) << "1. Running OpenCV's RANSAC with threshold " << drawing_threshold_ << " px";
-			opencvFundamentalMatrixFitting(ransac_confidence_,
-				drawing_threshold_, // The maximum sigma value allowed in MAGSAC
-				scene, // The scene type
-				false, // A flag to draw and show the results
-				false); // A flag to apply the MAGSAC post-processing to the OpenCV's output
+			// LOG(INFO) << "1. Running OpenCV's RANSAC with threshold " << drawing_threshold_ << " px";
+			// opencvFundamentalMatrixFitting(ransac_confidence_,
+			// 	drawing_threshold_, // The maximum sigma value allowed in MAGSAC
+			// 	scene, // The scene type
+			// 	false, // A flag to draw and show the results
+			// 	false); // A flag to apply the MAGSAC post-processing to the OpenCV's output
 			
-			// Apply MAGSAC with fairly high maximum threshold
-			LOG(INFO) << "2. Running MAGSAC with fairly high maximum threshold (" << 5 << " px)";
-			testFundamentalMatrixFitting(ransac_confidence_, // The required confidence in the results
-				5.0, // The maximum sigma value allowed in MAGSAC
-				scene, // The scene type
-				false, // MAGSAC should be used
-				draw_results_, // A flag to draw and show the results 
-				drawing_threshold_); // The inlier threshold for visualization.
+			// // Apply MAGSAC with fairly high maximum threshold
+			// LOG(INFO) << "2. Running MAGSAC with fairly high maximum threshold (" << 5 << " px)";
+			// testFundamentalMatrixFitting(ransac_confidence_, // The required confidence in the results
+			// 	5.0, // The maximum sigma value allowed in MAGSAC
+			// 	scene, // The scene type
+			// 	false, // MAGSAC should be used
+			// 	draw_results_, // A flag to draw and show the results 
+			// 	drawing_threshold_); // The inlier threshold for visualization.
 			
-			// Apply MAGSAC++ with fairly high maximum threshold
-			LOG(INFO) << "3. Running MAGSAC++ with fairly high maximum threshold (" << 5 << " px)";
-			testFundamentalMatrixFitting(ransac_confidence_, // The required confidence in the results
-				5.0, // The maximum sigma value allowed in MAGSAC
-				scene, // The scene type
-				true, // MAGSAC++ should be used
-				draw_results_, // A flag to draw and show the results 
-				drawing_threshold_); // The inlier threshold for visualization.
+			// // Apply MAGSAC++ with fairly high maximum threshold
+			// LOG(INFO) << "3. Running MAGSAC++ with fairly high maximum threshold (" << 5 << " px)";
+			// testFundamentalMatrixFitting(ransac_confidence_, // The required confidence in the results
+			// 	5.0, // The maximum sigma value allowed in MAGSAC
+			// 	scene, // The scene type
+			// 	true, // MAGSAC++ should be used
+			// 	draw_results_, // A flag to draw and show the results 
+			// 	drawing_threshold_); // The inlier threshold for visualization.
 		// Run this part of the code if the problem is essential matrix fitting
 		} else if (scene_type_ == SceneType::EssentialMatrixScene)
 		{
@@ -259,22 +259,22 @@ void runTest(SceneType scene_type_, // The type of the fitting problem
 				false); // A flag to draw and show the results
 
 			// Apply MAGSAC with a reasonably set maximum threshold
-			LOG(INFO) << "2. Running MAGSAC with fairly high maximum threshold (" << 5 << " px)";
-			testEssentialMatrixFitting(ransac_confidence_, // The required confidence in the results
-				2.0, // The maximum sigma value allowed in MAGSAC
-				scene, // The scene type
-				false, // MAGSAC should be used
-				draw_results_, // A flag to draw and show the results 
-				drawing_threshold_); // The inlier threshold for visualization.
+			// LOG(INFO) << "2. Running MAGSAC with fairly high maximum threshold (" << 5 << " px)";
+			// testEssentialMatrixFitting(ransac_confidence_, // The required confidence in the results
+			// 	2.0, // The maximum sigma value allowed in MAGSAC
+			// 	scene, // The scene type
+			// 	false, // MAGSAC should be used
+			// 	draw_results_, // A flag to draw and show the results 
+			// 	drawing_threshold_); // The inlier threshold for visualization.
 
-			// Apply MAGSAC with a reasonably set maximum threshold
-			LOG(INFO) << "3. Running MAGSAC++ with fairly high maximum threshold (" << 5 << " px)";
-			testEssentialMatrixFitting(ransac_confidence_, // The required confidence in the results
-				2.0, // The maximum sigma value allowed in MAGSAC
-				scene, // The scene type
-				true, // MAGSAC++ should be used
-				draw_results_, // A flag to draw and show the results 
-				drawing_threshold_); // The inlier threshold for visualization.
+			// // Apply MAGSAC with a reasonably set maximum threshold
+			// LOG(INFO) << "3. Running MAGSAC++ with fairly high maximum threshold (" << 5 << " px)";
+			// testEssentialMatrixFitting(ransac_confidence_, // The required confidence in the results
+			// 	2.0, // The maximum sigma value allowed in MAGSAC
+			// 	scene, // The scene type
+			// 	true, // MAGSAC++ should be used
+			// 	draw_results_, // A flag to draw and show the results 
+			// 	drawing_threshold_); // The inlier threshold for visualization.
 		}
 
 		if (FLAGS_draw_results)
@@ -476,12 +476,19 @@ void testEssentialMatrixFitting(
 
 	std::chrono::time_point<std::chrono::system_clock> end,
 		start = std::chrono::system_clock::now();
+	std::vector<double> weights;
+	for (int i=0; i<51; i++)
+	{
+		weights.push_back(1.0);
+	}
 	magsac.run(normalized_points, // The data points
 		ransac_confidence_, // The required confidence in the results
 		estimator, // The used estimator
 		main_sampler, // The sampler used for selecting minimal samples in each iteration
 		model, // The estimated model
 		iteration_number, // The number of iterations
+		weights,
+		50,
 		score); // The score of the estimated model
 	end = std::chrono::system_clock::now();
 
@@ -622,7 +629,11 @@ void testFundamentalMatrixFitting(
 
 	int iteration_number = 0; // Number of iterations required
 	ModelScore score; // The model score
-
+	std::vector<double> weights;
+	for (int i=0; i<50; i++)
+	{
+		weights.push_back(1.0);
+	}
 	std::chrono::time_point<std::chrono::system_clock> end,
 		start = std::chrono::system_clock::now();
 	const bool success = magsac.run(points, // The data points
@@ -631,6 +642,8 @@ void testFundamentalMatrixFitting(
 		main_sampler, // The sampler used for selecting minimal samples in each iteration
 		model, // The estimated model
 		iteration_number, // The number of iterations
+		weights,
+		50,
 		score); // The score of the estimated model
 	end = std::chrono::system_clock::now();
 
@@ -791,7 +804,11 @@ void testHomographyFitting(
 
 	int iteration_number = 0; // Number of iterations required
 	ModelScore score; // The model score
-
+	std::vector<double> weights;
+	for (int i=0; i<51; i++)
+	{
+		weights.push_back(1.0);
+	}
 	std::chrono::time_point<std::chrono::system_clock> end, 
 		start = std::chrono::system_clock::now();
 	magsac.run(points, // The data points
@@ -800,6 +817,8 @@ void testHomographyFitting(
 		main_sampler, // The sampler used for selecting minimal samples in each iteration
 		model, // The estimated model
 		iteration_number, // The number of iterations
+		weights,
+		50,
 		score); // The score of the estimated model
 	end = std::chrono::system_clock::now();
 	 

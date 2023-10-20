@@ -203,7 +203,8 @@ namespace magsac
 						inliers_,
 						minimal_sample_,
 						threshold_,
-						model_updated_);
+						model_updated_
+						);
 
 				// If DEGENSAC is not applied and the model passed the previous tests,
 				// assume that it is a valid model.
@@ -216,7 +217,8 @@ namespace magsac
 				const std::vector<size_t> &inliers_, // The inliers of the input model
 				const size_t *minimal_sample_, // The minimal sample used for estimating the model
 				const double threshold_, // The inlier-outlier threshold
-				bool &model_updated_) const // A flag saying if the model has been updated here
+				bool &model_updated_
+				) const // A flag saying if the model has been updated here
 			{
 				// Set the flag initially to false since the model has not been yet updated.
 				model_updated_ = false;
@@ -423,12 +425,19 @@ namespace magsac
 
 					int iteration_number = 0; // Number of iterations required
 					ModelScore score;
+					std::vector<double> weights;
+					for (int i=0; i<50; i++)
+					{
+						weights.push_back(1.0);
+					}
 					const bool success = magsac.run(data_, // The data points
 						0.99, // The required confidence in the results
 						estimator, // The used estimator
 						sampler, // The sampler used for selecting minimal samples in each iteration
 						model, // The estimated model
 						iteration_number, // The number of iterations
+						weights,
+						50,
 						score);
 					
 					// If more inliers are found the what initially was given,
@@ -523,7 +532,7 @@ namespace magsac
 	namespace utils
 	{
 		// The default estimator for essential matrix fitting
-		typedef estimator::EssentialMatrixEstimator<gcransac::estimator::solver::EssentialMatrixFivePointSteweniusSolver, // The solver used for fitting a model to a minimal sample
+		typedef estimator::EssentialMatrixEstimator<gcransac::estimator::solver::EssentialMatrixFivePointNisterSolver, // The solver used for fitting a model to a minimal sample
 			gcransac::estimator::solver::EssentialMatrixBundleAdjustmentSolver> // The solver used for fitting a model to a non-minimal sample
 			DefaultEssentialMatrixEstimator;
 

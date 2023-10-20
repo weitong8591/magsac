@@ -15,6 +15,8 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Wno-write-strings")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -ansi")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -funroll-loops")
+
+
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 # ==============================================================================
@@ -24,6 +26,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS "-fpermissive")
+set(CMAKE_C_FLAGS "-fPIC")
+set(CMAKE_CXX_FLAGS "-fPIC -std=c++17")
 # ==============================================================================
 # Find OpenCV
 # ==============================================================================
@@ -57,6 +61,7 @@ else()
 	message("Glog library found.")
 endif()
 
+
 if(IS_MSVC)
     # Some fixes for the Glog library.
     add_definitions("-DGLOG_NO_ABBREVIATED_SEVERITIES")
@@ -64,6 +69,7 @@ if(IS_MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
     # Enable object level parallel builds in Visual Studio.
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
+    #SET(CMAKE_EXE_LINKER_FLAGS " -no-pie")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 endif()
 
@@ -93,6 +99,8 @@ SET(SOURCE_DIR "src/pymagsac")
 
 include_directories (
 	${PROJECT_SOURCE_DIR}/graph-cut-ransac/src/pygcransac/include
+	#"/home/mrt/wt_code/ngsoft-master-bk/orimagsac/magsac/graph-cut-ransac/src/pygcransac/include/estimators"
+	#"/home/mrt/wt_code/ngsoft-master-bk/orimagsac/magsac/graph-cut-ransac/src/pygcransac/include/samplers"
 )
 
 # ==============================================================================

@@ -18,23 +18,32 @@ int findFundamentalMatrix_(std::vector<double>& srcPts,
                            std::vector<double>&  F,
                            std::vector<size_t> &minimal_samples,
                            std::vector<double> &point_probabilities,
-                            double variance,
+                           std::vector<double> &point_preferences,//
+                           std::vector<double> &degradation,//
+                           std::vector<double> &weights,//
+                           double variance,
                            double sourceImageWidth,
                            double sourceImageHeight,
                            double destinationImageWidth,
                            double destinationImageHeight,
-						   bool use_magsac_plus_plus = true,
+                           bool use_magsac_plus_plus = true,
                            double sigma_th = 3.0,
                            double conf = 0.99,
                            int max_iters = 10000,
                            int partition_num = 5,
                            int sampler_id = 0,
-                           bool save_minimal_samples = false);
+                           int non_randomness = 0,//
+                           bool save_minimal_samples = false,
+                           bool multiple_variances = false,
+                           int histogram_size=50,
+                           double histogram_max=3.0);//
+                           //bool save_minimal_samples = false);
                 
 int findHomography_(std::vector<double>& srcPts,
                     std::vector<double>& dstPts,
                     std::vector<bool>& inliers,
                     std::vector<double>& H,
+                    std::vector<double> &weights,//
                     double sourceImageWidth,
                     double sourceImageHeight,
                     double destinationImageWidth,
@@ -43,7 +52,9 @@ int findHomography_(std::vector<double>& srcPts,
                     double sigma_th = 3.0,
                     double conf = 0.99,
                     int max_iters = 10000,
-                    int partition_num = 5);
+                    int partition_num = 5,
+                    int histogram_size=50,
+                    double histogram_max=3.0);
 
 int findEssentialMatrix_(std::vector<double>& srcPts,
     std::vector<double>& dstPts,
@@ -53,6 +64,9 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
     std::vector<double>& intrinsics_dst,
     std::vector<size_t> &minimal_samples,    
     std::vector<double> &point_probabilities,
+    std::vector<double> &point_preferences,//
+    std::vector<double> &degradation,//
+    std::vector<double> &weights,//
     double variance,
     double sourceImageWidth,
     double sourceImageHeight,
@@ -64,4 +78,19 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
     int max_iters,
     int partition_num,
     int sampler_id,
-    bool save_minimal_samples);
+    int non_randomness,//
+    bool save_minimal_samples,
+    bool multiple_variances,
+    int histogram_size,
+    double histogram_max);//
+    //bool save_minimal_samples);
+    
+    
+void optimizeEssentialMatrix_(
+std::vector<double> &correspondences,
+//std::vector<double>& dstPts,
+std::vector<double>& src_K,
+std::vector<double>& dst_K,
+std::vector<size_t>&inliers, std::vector<double>&best_model,
+std::vector<double> &E, double threshold, double estimated_score
+);

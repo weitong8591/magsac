@@ -12,6 +12,7 @@
 #include "samplers/importance_sampler.h"
 #include "samplers/uniform_sampler.h"
 #include "samplers/prosac_sampler.h"
+#include "samplers/gumbel_softmax_sampler.h"
 #include <thread>
 
 #include <gflags/gflags.h>
@@ -23,6 +24,9 @@ int findFundamentalMatrix_(std::vector<double>& srcPts,
     std::vector<double>& F,
     std::vector<size_t> &minimal_samples,
     std::vector<double> &point_probabilities,
+    std::vector<double> &point_preferences,
+    std::vector<double> &degradation,//
+    std::vector<double> &weights,
     double variance,
     double sourceImageWidth,
     double sourceImageHeight,
@@ -34,7 +38,11 @@ int findFundamentalMatrix_(std::vector<double>& srcPts,
     int max_iters,
     int partition_num,
     int sampler_id,
-    bool save_minimal_samples)
+    int non_randomness,//
+    bool save_minimal_samples,
+    bool multiple_variances,
+    int histogram_size,
+    double histogram_max) //50)//
 {
     magsac::utils::DefaultFundamentalMatrixEstimator estimator(0.1); // The robust homography estimator class containing the
     gcransac::FundamentalMatrix model; // The estimated model
@@ -55,7 +63,8 @@ int findFundamentalMatrix_(std::vector<double>& srcPts,
     magsac->setCoreNumber(1); // The number of cores used to speed up sigma-consensus
     magsac->setPartitionNumber(partition_num); // The number partitions used for speeding up sigma consensus. As the value grows, the algorithm become slower and, usually, more accurate.
     magsac->setIterationLimit(max_iters);
-    magsac->setMinimumIterationNumber(1000);
+    magsac->setMinimumIterationNumber(10);
+    magsac->setHistogramThreshold(histogram_max); // The maximum noise scale sigma allowed
 
     int num_tents = srcPts.size() / 2;
     cv::Mat points(num_tents, 4, CV_64F);
@@ -97,8 +106,19 @@ int findFundamentalMatrix_(std::vector<double>& srcPts,
             prob /= max_prob;
 		main_sampler = std::unique_ptr<AbstractSampler>(new gcransac::sampler::ProbabilisticReorderingSampler(&points, 
             point_probabilities,
+            point_preferences,//
+            degradation,//
             estimator.sampleSize(),
-            variance));
+            variance,
+            non_randomness,//
+            multiple_variances));//
+    }
+    else if (sampler_id == 5)
+    {
+
+    	main_sampler = std::unique_ptr<AbstractSampler>(new gcransac::sampler::GumbelSoftmaxSampler(&points, point_probabilities,
+            estimator.sampleSize()));
+
     }
     else
 	{
@@ -115,6 +135,8 @@ int findFundamentalMatrix_(std::vector<double>& srcPts,
         *main_sampler.get(), // The sampler used for selecting minimal samples in each iteration
         model, // The estimated model
         iteration_number, // The number of iterations
+        weights, // trained weights
+		histogram_size, //50
         score); // The score of the estimated model
     inliers.resize(num_tents);
 
@@ -168,6 +190,9 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
     std::vector<double>& dst_K,
     std::vector<size_t> &minimal_samples,
     std::vector<double> &point_probabilities,
+    std::vector<double> &point_preferences,//
+    std::vector<double> &degradation,//
+    std::vector<double> &weights,
     double variance,
     double sourceImageWidth,
     double sourceImageHeight,
@@ -179,7 +204,11 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
     int max_iters,
     int partition_num,
     int sampler_id,
-    bool save_minimal_samples)
+    int non_randomness,//
+    bool save_minimal_samples,
+    bool multiple_variances,
+    int histogram_size, //50)//
+    double histogram_max    )//
 {
     int num_tents = srcPts.size() / 2;
     cv::Mat points(num_tents, 4, CV_64F);
@@ -214,13 +243,13 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
         (fx1 + fx2 + fy1 + fy2) / 4.0;
     const double normalized_sigma_max =
         sigma_max / threshold_normalizer;
-
+/*
     cv::Mat normalized_points(points.size(), CV_64F);
     gcransac::utils::normalizeCorrespondences(points,
         intrinsics_src,
         intrinsics_dst,
         normalized_points);
-
+*/
     magsac::utils::DefaultEssentialMatrixEstimator estimator(
         intrinsics_src,
         intrinsics_dst); // The robust essential matrix estimator class
@@ -240,12 +269,13 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
     magsac.setPartitionNumber(partition_num); // The number partitions used for speeding up sigma consensus. As the value grows, the algorithm become slower and, usually, more accurate.
     magsac.setIterationLimit(max_iters);
     magsac.setReferenceThreshold(magsac.getReferenceThreshold() / threshold_normalizer); // The reference threshold inside MAGSAC++ should also be normalized.
-    magsac.setMinimumIterationNumber(1000);
-
+    magsac.setMinimumIterationNumber(10);
+    magsac.setHistogramThreshold(histogram_max);
 	// Initialize the sampler used for selecting minimal samples
 	// The main sampler is used for sampling in the main RANSAC loop
 	typedef gcransac::sampler::Sampler<cv::Mat, size_t> AbstractSampler;
 	std::unique_ptr<AbstractSampler> main_sampler;
+	//std::cout<<sampler_id<<"id"<<std::endl;
 	if (sampler_id == 0) // Initializing a RANSAC-like uniformly random sampler
 		main_sampler = std::unique_ptr<AbstractSampler>(new gcransac::sampler::UniformSampler(&points));
 	else if (sampler_id == 1)  // Initializing a PROSAC sampler. This requires the points to be ordered according to the quality.
@@ -273,8 +303,12 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
             prob /= max_prob;
 		main_sampler = std::unique_ptr<AbstractSampler>(new gcransac::sampler::ProbabilisticReorderingSampler(&points, 
             point_probabilities,
+            point_preferences,//
+            degradation,//
             estimator.sampleSize(),
-            variance));
+            variance,
+            non_randomness,//
+            multiple_variances));//
     } else
 	{
 		fprintf(stderr, "Unknown sampler identifier: %d. The accepted samplers are 0 (uniform sampling), 1 (PROSAC sampling), 2 (P-NAPSAC sampling)\n",
@@ -284,12 +318,14 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
 
     ModelScore score;
     int iteration_number = 0;
-    bool success = magsac.run(normalized_points, // The data points
+    bool success = magsac.run(points, // The data points
         conf, // The required confidence in the results
         estimator, // The used estimator
         *main_sampler.get(), // The sampler used for selecting minimal samples in each iteration
         model, // The estimated model
         iteration_number, // The number of iterations
+        weights,
+        histogram_size,
         score); // The score of the estimated model
     inliers.resize(num_tents);
 
@@ -322,7 +358,7 @@ int findEssentialMatrix_(std::vector<double>& srcPts,
     int num_inliers = 0;
     for (auto pt_idx = 0; pt_idx < points.rows; ++pt_idx) {
         const int is_inlier = 
-            estimator.residual(normalized_points.row(pt_idx), model.descriptor) <= normalized_sigma_max;
+            estimator.residual(points.row(pt_idx), model.descriptor) <= normalized_sigma_max;
         inliers[pt_idx] = (bool)is_inlier;
         num_inliers += is_inlier;
     }
@@ -341,6 +377,7 @@ int findHomography_(std::vector<double>& srcPts,
                     std::vector<double>& dstPts,
                     std::vector<bool>& inliers,
                     std::vector<double>& H,
+                    std::vector<double>& weights,
                     double sourceImageWidth,
                     double sourceImageHeight,
                     double destinationImageWidth,
@@ -349,7 +386,9 @@ int findHomography_(std::vector<double>& srcPts,
                     double sigma_max,
                     double conf,
                     int max_iters,
-                    int partition_num)
+                    int partition_num,
+                    int histogram_size,
+                    double histogram_max)
 
 {
     magsac::utils::DefaultHomographyEstimator estimator; // The robust homography estimator class containing the function for the fitting and residual calculation
@@ -367,7 +406,7 @@ int findHomography_(std::vector<double>& srcPts,
     magsac->setCoreNumber(1); // The number of cores used to speed up sigma-consensus
     magsac->setPartitionNumber(partition_num); // The number partitions used for speeding up sigma consensus. As the value grows, the algorithm become slower and, usually, more accurate.
     magsac->setIterationLimit(max_iters);
-    
+    magsac->setHistogramThreshold(histogram_max);
 	ModelScore score;
 	
     int num_tents = srcPts.size()/2;
@@ -396,6 +435,8 @@ int findHomography_(std::vector<double>& srcPts,
                               main_sampler, // The sampler used for selecting minimal samples in each iteration
                               model, // The estimated model
                               max_iters, // The number of iterations
+                              weights,
+                              histogram_size,
 							  score); // The score of the estimated model
     inliers.resize(num_tents);
     if (!success) {
@@ -537,3 +578,151 @@ int adaptiveInlierSelection_(
 
     return selectedInliers.size();
 }
+void optimizeEssentialMatrix_(
+std::vector<double> &correspondences,
+//std::vector<double>& dstPts,
+std::vector<double>& src_K,
+std::vector<double>& dst_K,
+std::vector<size_t>& inliers_,
+std::vector<double>& best_model,
+std::vector<double>&E, double threshold, double estimated_score
+)
+
+{
+	int num_tents = correspondences.size() / 4;
+	cv::Mat points(num_tents, 4, CV_64F, &correspondences[0]);
+	int iterations = 0;
+	
+	gcransac::EssentialMatrix model;
+	model.descriptor.resize(3,3);
+	//model.descriptor = estimated_model;
+	//std::cout<<"points"<<points<<std::endl;
+	//Eigen::Matrix3d estimated_model;
+	for (size_t i = 0; i < 3; ++i) {
+		for (size_t j = 0; j < 3;++j) {
+			model.descriptor(j, i) = best_model[i * 3 + j];
+			//std::cout<<model.descriptor(j, i)<<std::endl;
+		}
+	}
+	
+	std::vector<gcransac::Model> models = {model};
+	
+	//std::cout<<"input best modddddddel sizzze"<<models.size()<<std::endl;
+
+	Eigen::Matrix3d intrinsics_src,
+		intrinsics_dst;
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			intrinsics_src(i, j) = src_K[i * 3 + j];
+		}
+	}
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			intrinsics_dst(i, j) = dst_K[i * 3 + j];
+		}
+	}
+
+	gcransac::utils::DefaultEssentialMatrixEstimator estimator(intrinsics_src,
+		intrinsics_dst);
+	//fprintf(inliers_);
+	//std::cout<<"inliers in cpp:"<<std::endl;
+	//for (int    i=0;i<inliers_.size();i++)
+	//{
+	
+	 //  std::cout<<inliers_[i]<<std::endl;
+	//}
+	//std::cout<<"inliers end"<<std::endl;
+		
+	gcransac::estimator::solver::EssentialMatrixBundleAdjustmentSolver bundleOptimizer;
+	bundleOptimizer.estimateModel(
+		points,
+		&inliers_[0],
+		inliers_.size(),
+		models);
+	
+	//std::cout<<"models after BA:"<<models.size()<<std::endl;
+	//fprintf(inliers_.size());
+	const double &fx1 = intrinsics_src(0, 0);
+	const double &fy1 = intrinsics_src(1, 1);
+	const double &fx2 = intrinsics_dst(0, 0);
+	const double &fy2 = intrinsics_dst(1, 1);
+
+	const double threshold_normalizer = (fx1 + fx2 + fy1 + fy2) / 4.0;
+	//std::cout<<fx1<<fx2<<fy1<<fy2<<std::endl;
+	// The truncated least-squares threshold
+	const double truncated_threshold =  3.0/2.0 *threshold / threshold_normalizer;
+	// The squared least-squares threshold
+	const double squared_truncated_threshold = truncated_threshold * truncated_threshold;
+	//std::cout<<"threshold:"<<threshold_normalizer<<threshold<<squared_truncated_threshold<<std::endl;
+	// Scoring function
+	gcransac::MSACScoringFunction<gcransac::utils::DefaultEssentialMatrixEstimator> scoring;
+	scoring.initialize(squared_truncated_threshold, points.rows);
+	// Score of the new model
+	gcransac::Score score;
+	// Inliers of the new model
+	std::vector<size_t> inliers;
+	
+	//gcransac::EssentialMatrix model;
+	//mo//del.descriptor.resize(3,3);
+	//model.descriptor = estimated_model;
+	
+	//model.descriptor = Eigen::Matrix3d::Identity();
+	// Select the best model and update the inliers
+	for (auto& tmp_model : models)
+	{
+		inliers.clear();
+		//std::cout<<points<<std::endl;
+		//std::cout<<"model"<<tmp_model.descriptor<<std::endl;
+		score = scoring.getScore(points, // All points
+		tmp_model,// The current model parameters
+		estimator,// The estimator 
+		squared_truncated_threshold, // The current threshold
+		inliers); // The current inlier set
+		//for (int i = 0; i < 3; i++) {
+		//	for (int j = 0; j < 3; j++) {
+		//		std::cout<<"check"<<std::endl;
+		//		std::cout<<"tmp model "<<tmp_model.descriptor(i, j)<<std::endl;
+		//		}
+		//	}
+		
+		//std::cout<<"score"<<score.value<<std::endl;
+		//std::cout<<"estimated_score"<<score.value<<std::endl;
+		//std::cout<<"next model"<<std::endl;
+		// Check if the updated model is better than the best so far
+		if (estimated_score < score.value)
+		{
+			//std::cout<<"find a better"<<std::endl;
+			model.descriptor = tmp_model.descriptor;
+			estimated_score = score.value;
+			inliers_.swap(inliers);
+		}
+		
+		
+	}
+	
+	inliers.resize(num_tents);
+
+	const int num_inliers = inliers.size();
+	for (auto pt_idx = 0; pt_idx < num_tents; ++pt_idx) {
+		inliers[pt_idx] = 0;
+
+	}
+	for (auto pt_idx = 0; pt_idx < num_inliers; ++pt_idx) {
+		inliers[inliers[pt_idx]] = 1;
+	}
+
+	E.resize(9);
+	//ssstd::cout<<"E before filling"<<E<<std::endl;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			//std::cout<<"from model to E"<<i * 3 + j<<model.descriptor(i, j)<<std::endl;
+			E[i * 3 + j] = (double)model.descriptor(i, j);
+			//std::cout<<"E"<<i * 3 + j<<E[i * 3 + j]<<std::endl;
+		}
+	}
+	
+	//std::cout<<"_____"<<std::endl;
+	
+}	
