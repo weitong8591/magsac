@@ -491,11 +491,18 @@ namespace magsac
 
 					int iteration_number = 0; // Number of iterations required
 					ModelScore score;
+					std::vector<double> weights;
+					for (int i=0; i<50; i++)
+					{
+						weights.push_back(1.0);
+					}
+					std::cout<<"estimators___debug"<<std::endl;
 					const bool success = magsac.run(data_, // The data points
 						0.99, // The required confidence in the results
 						estimator, // The used estimator
 						sampler, // The sampler used for selecting minimal samples in each iteration
 						model, // The estimated model
+						weights,
 						iteration_number, // The number of iterations
 						score);
 					

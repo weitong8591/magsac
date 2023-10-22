@@ -25,6 +25,10 @@ int findRigidTransformation_(
     std::vector<bool>& inliers,
     std::vector<double>& F,
     std::vector<double>& inlier_probabilities,
+    std::vector<double>& weights,
+    double histogram_max,
+    int histogram_size,
+    bool histogram_use,
     int sampler_id,
     bool use_magsac_plus_plus,
     double sigma_max,
@@ -48,7 +52,10 @@ int findRigidTransformation_(
     magsac->setCoreNumber(1); // The number of cores used to speed up sigma-consensus
     magsac->setPartitionNumber(partition_num); // The number partitions used for speeding up sigma consensus. As the value grows, the algorithm become slower and, usually, more accurate.
     magsac->setIterationLimit(max_iters);
-	magsac->setMinimumIterationNumber(min_iters);
+	magsac->setHistogramMax(min_iters);
+    magsac->setHistogramMax(histogram_max);
+    magsac->setHistogramSize(histogram_size);
+    magsac->setReferenceThreshold(histogram_use);
 
     int num_tents = correspondences.size() / 6;
     cv::Mat points(num_tents, 6, CV_64F, &correspondences[0]);
@@ -114,6 +121,7 @@ int findRigidTransformation_(
         estimator, // The used estimator
         *main_sampler.get(), // The sampler used for selecting minimal samples in each iteration
         model, // The estimated model
+        weights,
         max_iters, // The number of iterations
         score); // The score of the estimated model
     inliers.resize(num_tents);
@@ -157,6 +165,10 @@ int findFundamentalMatrix_(
     std::vector<bool>& inliers,
     std::vector<double>& F,
     std::vector<double>& inlier_probabilities,
+    std::vector<double>& weights,
+    double histogram_max,
+    int histogram_size,
+    bool histogram_use,
     double sourceImageWidth,
     double sourceImageHeight,
     double destinationImageWidth,
@@ -184,6 +196,9 @@ int findFundamentalMatrix_(
     magsac->setPartitionNumber(partition_num); // The number partitions used for speeding up sigma consensus. As the value grows, the algorithm become slower and, usually, more accurate.
     magsac->setIterationLimit(max_iters);
 	magsac->setMinimumIterationNumber(min_iters);
+    magsac->setHistogramMax(histogram_max);
+    magsac->setHistogramSize(histogram_size);
+    magsac->setReferenceThreshold(histogram_use);
 
     int num_tents = correspondences.size() / 4;
     cv::Mat points(num_tents, 4, CV_64F, &correspondences[0]);
@@ -249,6 +264,7 @@ int findFundamentalMatrix_(
         estimator, // The used estimator
         *main_sampler.get(), // The sampler used for selecting minimal samples in each iteration
         model, // The estimated model
+        weights,
         max_iters, // The number of iterations
         score); // The score of the estimated model
     inliers.resize(num_tents);
@@ -293,6 +309,10 @@ int findEssentialMatrix_(std::vector<double>& correspondences,
     std::vector<double>& src_K,
     std::vector<double>& dst_K,
     std::vector<double>& inlier_probabilities,
+    std::vector<double>& his_weights,
+    double histogram_max,
+    int histogram_size,
+    bool histogram_use,
     double sourceImageWidth,
     double sourceImageHeight,
     double destinationImageWidth,
@@ -333,11 +353,11 @@ int findEssentialMatrix_(std::vector<double>& correspondences,
     const double normalized_sigma_max =
         sigma_max / threshold_normalizer;
 
-    cv::Mat normalized_points(points.size(), CV_64F);
-    gcransac::utils::normalizeCorrespondences(points,
-        intrinsics_src,
-        intrinsics_dst,
-        normalized_points);
+    // cv::Mat normalized_points(points.size(), CV_64F);
+    // gcransac::utils::normalizeCorrespondences(points,
+    //     intrinsics_src,
+    //     intrinsics_dst,
+    //     normalized_points);
 
     magsac::utils::DefaultEssentialMatrixEstimator estimator(
         intrinsics_src,
@@ -355,7 +375,9 @@ int findEssentialMatrix_(std::vector<double>& correspondences,
     magsac.setIterationLimit(max_iters);
 	magsac.setMinimumIterationNumber(min_iters);
     magsac.setReferenceThreshold(magsac.getReferenceThreshold() / threshold_normalizer); // The reference threshold inside MAGSAC++ should also be normalized.
-	
+	magsac.setHistogramMax(histogram_max);
+    magsac.setHistogramSize(histogram_size);
+    magsac.setReferenceThreshold(histogram_use);
 	// Initialize the samplers
 	// The main sampler is used for sampling in the main RANSAC loop
 	typedef gcransac::sampler::Sampler<cv::Mat, size_t> AbstractSampler;
@@ -399,11 +421,12 @@ int findEssentialMatrix_(std::vector<double>& correspondences,
 	}
 
     ModelScore score;
-    bool success = magsac.run(normalized_points, // The data points
+    bool success = magsac.run(points, // The data points
         conf, // The required confidence in the results
         estimator, // The used estimator
         *main_sampler.get(), // The sampler used for selecting minimal samples in each iteration
         model, // The estimated model
+        his_weights,
         max_iters, // The number of iterations
         score); // The score of the estimated model
     inliers.resize(num_tents);
@@ -430,7 +453,7 @@ int findEssentialMatrix_(std::vector<double>& correspondences,
     double residual;
     int num_inliers = 0;
     for (auto pt_idx = 0; pt_idx < points.rows; ++pt_idx) {
-        residual = estimator.residual(normalized_points.row(pt_idx), model.descriptor);
+        residual = estimator.residual(points.row(pt_idx), model.descriptor);
         const int is_inlier = 
             residual <= normalized_sigma_max;
         inliers[pt_idx] = (bool)is_inlier;
@@ -449,7 +472,7 @@ int findEssentialMatrix_(std::vector<double>& correspondences,
         std::vector<gcransac::Model> models = { model };
 		gcransac::estimator::solver::EssentialMatrixBundleAdjustmentSolver bundleOptimizer;
 		bundleOptimizer.estimateModel(
-			normalized_points,
+			points,
 			&inlier_indices[0],
 			inlier_indices.size(),
 			models,
@@ -477,6 +500,10 @@ int findHomography_(std::vector<double>& correspondences,
                     std::vector<bool>& inliers,
                     std::vector<double>& H,
                     std::vector<double>& inlier_probabilities,
+                    std::vector<double>& weights,
+                    double histogram_max,
+                    int histogram_size,
+                    bool histogram_use,
                     double sourceImageWidth,
                     double sourceImageHeight,
                     double destinationImageWidth,
@@ -506,7 +533,9 @@ int findHomography_(std::vector<double>& correspondences,
     magsac->setPartitionNumber(partition_num); // The number partitions used for speeding up sigma consensus. As the value grows, the algorithm become slower and, usually, more accurate.
     magsac->setIterationLimit(max_iters);
 	magsac->setMinimumIterationNumber(min_iters);
-
+    magsac->setHistogramMax(histogram_max);
+    magsac->setHistogramSize(histogram_size);
+    magsac->setReferenceThreshold(histogram_use);
 	ModelScore score;
 	
     int num_tents = correspondences.size() / 4;
@@ -559,6 +588,7 @@ int findHomography_(std::vector<double>& correspondences,
                               estimator, // The used estimator
                               *main_sampler.get(), // The sampler used for selecting minimal samples in each iteration
                               model, // The estimated model
+                              weights,
                               max_iters, // The number of iterations
 							  score); // The score of the estimated model
     inliers.resize(num_tents);

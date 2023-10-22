@@ -83,6 +83,10 @@ py::tuple adaptiveInlierSelection(
 py::tuple findRigidTransformation(
 	py::array_t<double>  correspondences_,
 	py::array_t<double>  probabilities_,
+    py::array_t<double> weights_,
+    double histogram_max,
+    int histogram_size,
+    bool histogram_use,
 	int sampler,
     bool use_magsac_plus_plus,
     double sigma_th,
@@ -116,12 +120,19 @@ py::tuple findRigidTransformation(
         double* ptr_prob = (double*)buf_prob.ptr;
         probabilities.assign(ptr_prob, ptr_prob + buf_prob.size);        
     }
-
+    std::vector<double> weights(histogram_size);
+    py::buffer_info buf_wei = weights_.request();
+    double* ptr_wei = (double*)buf_wei.ptr;
+    weights.assign(ptr_wei, ptr_wei + buf_wei.size); 
     int num_inl = findRigidTransformation_(
         correspondences,
         inliers,
         T,
         probabilities,
+        weights,
+        histogram_max,
+        histogram_size,
+        histogram_use,
         sampler,
         use_magsac_plus_plus,
         sigma_th,
@@ -153,6 +164,10 @@ py::tuple findFundamentalMatrix(
     double w2,
     double h2,
 	py::array_t<double>  probabilities_,
+    py::array_t<double> weights_,
+    double histogram_max,
+    int histogram_size,
+    bool histogram_use,
 	int sampler,
     bool use_magsac_plus_plus,
     double sigma_th,
@@ -186,12 +201,19 @@ py::tuple findFundamentalMatrix(
         double* ptr_prob = (double*)buf_prob.ptr;
         probabilities.assign(ptr_prob, ptr_prob + buf_prob.size);        
     }
-
+    std::vector<double> weights(histogram_size);
+    py::buffer_info buf_wei = weights_.request();
+    double* ptr_wei = (double*)buf_wei.ptr;
+    weights.assign(ptr_wei, ptr_wei + buf_wei.size); 
     int num_inl = findFundamentalMatrix_(
         correspondences,
         inliers,
         F,
         probabilities,
+        weights,
+        histogram_max,
+        histogram_size,
+        histogram_use,
         w1,
         h1,
         w2,
@@ -229,6 +251,10 @@ py::tuple findEssentialMatrix(
     double w2,
     double h2,
 	py::array_t<double>  probabilities_,
+    py::array_t<double> weights_,
+    double histogram_max,
+    int histogram_size,
+    bool histogram_use,
 	int sampler,
     bool use_magsac_plus_plus,
     double sigma_th,
@@ -284,7 +310,10 @@ py::tuple findEssentialMatrix(
         double* ptr_prob = (double*)buf_prob.ptr;
         probabilities.assign(ptr_prob, ptr_prob + buf_prob.size);        
     }
-
+    std::vector<double> weights(histogram_size);
+    py::buffer_info buf_wei = weights_.request();
+    double* ptr_wei = (double*)buf_wei.ptr;
+    weights.assign(ptr_wei, ptr_wei + buf_wei.size); 
     int num_inl = findEssentialMatrix_(
         correspondences,
         inliers,
@@ -292,6 +321,10 @@ py::tuple findEssentialMatrix(
         K1, 
         K2,
         probabilities,
+        weights,
+        histogram_max,
+        histogram_size,
+        histogram_use,
         w1,
         h1,
         w2,
@@ -328,7 +361,11 @@ py::tuple findHomography(
                          double h1,
                          double w2,
                          double h2,
-                         py::array_t<double>  probabilities_,
+                         py::array_t<double> probabilities_,
+                         py::array_t<double> weights_,
+                         double histogram_max,
+                         int histogram_size,
+                         bool histogram_use,
                          int sampler,
 						 bool use_magsac_plus_plus,
                          double sigma_th,
@@ -362,12 +399,19 @@ py::tuple findHomography(
         double* ptr_prob = (double*)buf_prob.ptr;
         probabilities.assign(ptr_prob, ptr_prob + buf_prob.size);        
     }
-    
+    std::vector<double> weights(histogram_size);
+    py::buffer_info buf_wei = weights_.request();
+    double* ptr_wei = (double*)buf_wei.ptr;
+    weights.assign(ptr_wei, ptr_wei + buf_wei.size); 
     int num_inl = findHomography_(
                     correspondences,
                     inliers,
                     H,
                     probabilities,
+                    weights,
+                    histogram_max,
+                    histogram_size,
+                    histogram_use,
                     w1,
                     h1,
                     w2,
@@ -430,6 +474,10 @@ PYBIND11_PLUGIN(pymagsac) {
         py::arg("w2"),
         py::arg("h2"),
         py::arg("probabilities"),
+        py::arg("weights"),                   
+        py::arg("histogram_max")=10.0,
+        py::arg("histogram_size")=200,
+        py::arg("histogram_use")=true,
 		py::arg("sampler") = 4,
         py::arg("use_magsac_plus_plus") = true,
         py::arg("sigma_th") = 1.0,
@@ -445,17 +493,25 @@ PYBIND11_PLUGIN(pymagsac) {
         py::arg("w2"),
         py::arg("h2"),
         py::arg("probabilities"),
+        py::arg("weights"),                   
+        py::arg("histogram_max")=10.0,
+        py::arg("histogram_size")=200,
+        py::arg("histogram_use")=true,
 		py::arg("sampler") = 4,
         py::arg("use_magsac_plus_plus") = true,
         py::arg("sigma_th") = 1.0,
         py::arg("conf") = 0.99,
         py::arg("min_iters") = 50,
         py::arg("max_iters") = 1000,
-        py::arg("partition_num") = 5);
+        py::arg("partition_num") = 5); 
 
     m.def("findRigidTransformation", &findRigidTransformation, R"doc(some doc)doc",
         py::arg("correspondences"),
         py::arg("probabilities"),
+        py::arg("weights"),                   
+        py::arg("histogram_max")=10.0,
+        py::arg("histogram_size")=200,
+        py::arg("histogram_use")=true,
 		py::arg("sampler") = 4,
         py::arg("use_magsac_plus_plus") = true,
         py::arg("sigma_th") = 1.0,
@@ -471,6 +527,10 @@ PYBIND11_PLUGIN(pymagsac) {
         py::arg("w2"),
         py::arg("h2"),
         py::arg("probabilities"),
+        py::arg("weights"),                   
+        py::arg("histogram_max")=10.0,
+        py::arg("histogram_size")=200,
+        py::arg("histogram_use")=true,
 		py::arg("sampler") = 4,
         py::arg("use_magsac_plus_plus") = true,
         py::arg("sigma_th") = 1.0,

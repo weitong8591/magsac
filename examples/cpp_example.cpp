@@ -473,11 +473,17 @@ void testEssentialMatrixFitting(
 
 	std::chrono::time_point<std::chrono::system_clock> end,
 		start = std::chrono::system_clock::now();
+	std::vector<double> weights;
+	for (int i=0; i<51; i++)
+	{
+		weights.push_back(1.0);
+	}
 	magsac.run(normalized_points, // The data points
 		ransac_confidence_, // The required confidence in the results
 		estimator, // The used estimator
 		main_sampler, // The sampler used for selecting minimal samples in each iteration
 		model, // The estimated model
+		weights,
 		iteration_number, // The number of iterations
 		score); // The score of the estimated model
 	end = std::chrono::system_clock::now();
@@ -622,11 +628,18 @@ void testFundamentalMatrixFitting(
 
 	std::chrono::time_point<std::chrono::system_clock> end,
 		start = std::chrono::system_clock::now();
+
+	std::vector<double> weights;
+	for (int i=0; i<51; i++)
+	{
+		weights.push_back(1.0);
+	}
 	const bool success = magsac.run(points, // The data points
 		ransac_confidence_, // The required confidence in the results
 		estimator, // The used estimator
 		main_sampler, // The sampler used for selecting minimal samples in each iteration
 		model, // The estimated model
+		weights,
 		iteration_number, // The number of iterations
 		score); // The score of the estimated model
 	end = std::chrono::system_clock::now();
@@ -791,11 +804,17 @@ void testHomographyFitting(
 
 	std::chrono::time_point<std::chrono::system_clock> end, 
 		start = std::chrono::system_clock::now();
+	std::vector<double> weights;
+	for (int i=0; i<51; i++)
+	{
+		weights.push_back(1.0);
+	}
 	magsac.run(points, // The data points
 		ransac_confidence_, // The required confidence in the results
 		estimator, // The used estimator
 		main_sampler, // The sampler used for selecting minimal samples in each iteration
 		model, // The estimated model
+		weights,
 		iteration_number, // The number of iterations
 		score); // The score of the estimated model
 	end = std::chrono::system_clock::now();
