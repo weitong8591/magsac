@@ -55,7 +55,7 @@ int findRigidTransformation_(
 	magsac->setHistogramMax(min_iters);
     magsac->setHistogramMax(histogram_max);
     magsac->setHistogramSize(histogram_size);
-    magsac->setReferenceThreshold(histogram_use);
+    magsac->setHistogramUse(histogram_use);
 
     int num_tents = correspondences.size() / 6;
     cv::Mat points(num_tents, 6, CV_64F, &correspondences[0]);
@@ -198,7 +198,7 @@ int findFundamentalMatrix_(
 	magsac->setMinimumIterationNumber(min_iters);
     magsac->setHistogramMax(histogram_max);
     magsac->setHistogramSize(histogram_size);
-    magsac->setReferenceThreshold(histogram_use);
+    magsac->setHistogramUse(histogram_use);
 
     int num_tents = correspondences.size() / 4;
     cv::Mat points(num_tents, 4, CV_64F, &correspondences[0]);
@@ -377,7 +377,7 @@ int findEssentialMatrix_(std::vector<double>& correspondences,
     magsac.setReferenceThreshold(magsac.getReferenceThreshold() / threshold_normalizer); // The reference threshold inside MAGSAC++ should also be normalized.
 	magsac.setHistogramMax(histogram_max);
     magsac.setHistogramSize(histogram_size);
-    magsac.setReferenceThreshold(histogram_use);
+    magsac.setHistogramUse(histogram_use);
 	// Initialize the samplers
 	// The main sampler is used for sampling in the main RANSAC loop
 	typedef gcransac::sampler::Sampler<cv::Mat, size_t> AbstractSampler;
@@ -535,7 +535,7 @@ int findHomography_(std::vector<double>& correspondences,
 	magsac->setMinimumIterationNumber(min_iters);
     magsac->setHistogramMax(histogram_max);
     magsac->setHistogramSize(histogram_size);
-    magsac->setReferenceThreshold(histogram_use);
+    magsac->setHistogramUse(histogram_use);
 	ModelScore score;
 	
     int num_tents = correspondences.size() / 4;

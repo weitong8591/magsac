@@ -69,7 +69,7 @@ public:
 	{
 		histogram_size = histogram_size_;
 	}
-	void setReferenceThreshold(const bool histogram_use_)
+	void setHistogramUse(const bool histogram_use_)
 	{
 		histogram_use = histogram_use_;
 	}	
