@@ -26,8 +26,8 @@
 #include "model.h"
 #include "estimators.h"
 
-#include <gflags/gflags.h>
-#include <glog/logging.h>
+#include </home/weitong/.conda/envs/score/include/gflags/gflags.h>
+#include </home/weitong/.conda/envs/score/include/glog/logging.h>
 
 /*
 	Initializing the flags

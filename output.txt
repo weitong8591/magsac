@@ -1,0 +1,153 @@
+CMake Warning (dev) at /home/weitong/.local/lib/python3.8/site-packages/pybind11/share/cmake/pybind11/FindPythonLibsNew.cmake:98 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/weitong/.local/lib/python3.8/site-packages/pybind11/share/cmake/pybind11/pybind11Tools.cmake:50 (find_package)
+  /home/weitong/.local/lib/python3.8/site-packages/pybind11/share/cmake/pybind11/pybind11Common.cmake:188 (include)
+  /home/weitong/.local/lib/python3.8/site-packages/pybind11/share/cmake/pybind11/pybind11Config.cmake:250 (include)
+  CMakeLists.txt:32 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+Glog library found.
+CMake Deprecation Warning at lib/pybind11/CMakeLists.txt:8 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at lib/pybind11/tools/pybind11Tools.cmake:8 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+Call Stack (most recent call first):
+  lib/pybind11/CMakeLists.txt:28 (include)
+
+
+gmake: Warning: File 'Makefile' has modification time 82 s in the future
+gmake[1]: Warning: File 'CMakeFiles/Makefile2' has modification time 82 s in the future
+gmake[2]: Warning: File 'CMakeFiles/GraphCutRANSAC.dir/flags.make' has modification time 82 s in the future
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: Warning: File 'CMakeFiles/GraphCutRANSAC.dir/flags.make' has modification time 82 s in the future
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/gamma_values.cpp:1:9: warning: #pragma once in main file
+    1 | #pragma once
+      |         ^~~~
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: Warning: File 'CMakeFiles/MAGSAC.dir/flags.make' has modification time 55 s in the future
+gmake[2]: Warning: File 'CMakeFiles/pymagsac.dir/flags.make' has modification time 55 s in the future
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: Warning: File 'CMakeFiles/MAGSAC.dir/flags.make' has modification time 55 s in the future
+gmake[2]: Warning: File 'CMakeFiles/pymagsac.dir/flags.make' has modification time 55 s in the future
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp: In function 'pybind11::tuple findFundamentalMatrix(pybind11::array_t<double>, pybind11::array_t<double>, double, double, double, double, pybind11::array_t<double>, double, bool, double, double, int, int, int, bool)':
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:255:65: warning: narrowing conversion of '(size_t)sample_number' from 'size_t' {aka 'long unsigned int'} to 'long int' [-Wnarrowing]
+  255 |         py::array_t<int> minimal_samples_(std::vector<ssize_t>{ sample_number, 7 });
+      |                                                                 ^~~~~~~~~~~~~
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:255:65: warning: narrowing conversion of 'sample_number' from 'const size_t' {aka 'const long unsigned int'} to 'long int' [-Wnarrowing]
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp: In function 'pybind11::tuple findEssentialMatrix(pybind11::array_t<double>, pybind11::array_t<double>, pybind11::array_t<double>, pybind11::array_t<double>, double, double, double, double, pybind11::array_t<double>, double, bool, double, double, int, int, int, bool)':
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:390:65: warning: narrowing conversion of '(size_t)sample_number' from 'size_t' {aka 'long unsigned int'} to 'long int' [-Wnarrowing]
+  390 |         py::array_t<int> minimal_samples_(std::vector<ssize_t>{ sample_number, 5 });
+      |                                                                 ^~~~~~~~~~~~~
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:390:65: warning: narrowing conversion of 'sample_number' from 'const size_t' {aka 'const long unsigned int'} to 'long int' [-Wnarrowing]
+In file included from /home/weitong/.local/lib/python3.8/site-packages/pybind11/include/pybind11/detail/../attr.h:13,
+                 from /home/weitong/.local/lib/python3.8/site-packages/pybind11/include/pybind11/detail/class.h:12,
+                 from /home/weitong/.local/lib/python3.8/site-packages/pybind11/include/pybind11/pybind11.h:13,
+                 from /home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:2:
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp: In function 'PyObject* PyInit_pymagsac()':
+/home/weitong/.local/lib/python3.8/site-packages/pybind11/include/pybind11/detail/../detail/common.h:428:34: warning: 'PyObject* pybind11_init()' is deprecated: PYBIND11_PLUGIN is deprecated, use PYBIND11_MODULE [-Wdeprecated-declarations]
+  428 |             return pybind11_init();                                                               \
+      |                                  ^
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:477:1: note: in expansion of macro 'PYBIND11_PLUGIN'
+  477 | PYBIND11_PLUGIN(pymagsac) {
+      | ^~~~~~~~~~~~~~~
+/home/weitong/.local/lib/python3.8/site-packages/pybind11/include/pybind11/detail/../detail/common.h:423:22: note: declared here
+  423 |     static PyObject *pybind11_init();                                                             \
+      |                      ^~~~~~~~~~~~~
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:477:1: note: in expansion of macro 'PYBIND11_PLUGIN'
+  477 | PYBIND11_PLUGIN(pymagsac) {
+      | ^~~~~~~~~~~~~~~
+/home/weitong/.local/lib/python3.8/site-packages/pybind11/include/pybind11/detail/../detail/common.h:428:34: warning: 'PyObject* pybind11_init()' is deprecated: PYBIND11_PLUGIN is deprecated, use PYBIND11_MODULE [-Wdeprecated-declarations]
+  428 |             return pybind11_init();                                                               \
+      |                                  ^
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:477:1: note: in expansion of macro 'PYBIND11_PLUGIN'
+  477 | PYBIND11_PLUGIN(pymagsac) {
+      | ^~~~~~~~~~~~~~~
+/home/weitong/.local/lib/python3.8/site-packages/pybind11/include/pybind11/detail/../detail/common.h:423:22: note: declared here
+  423 |     static PyObject *pybind11_init();                                                             \
+      |                      ^~~~~~~~~~~~~
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:477:1: note: in expansion of macro 'PYBIND11_PLUGIN'
+  477 | PYBIND11_PLUGIN(pymagsac) {
+      | ^~~~~~~~~~~~~~~
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp: In function 'PyObject* pybind11_init()':
+/home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:491:10: warning: 'pybind11::module_::module_(const char*, const char*)' is deprecated: Use PYBIND11_MODULE or module_::create_extension_module instead [-Wdeprecated-declarations]
+  491 |     )doc");
+      |          ^
+In file included from /home/weitong/code/1030/magsac/src/pymagsac/src/bindings.cpp:2:
+/home/weitong/.local/lib/python3.8/site-packages/pybind11/include/pybind11/pybind11.h:1159:14: note: declared here
+ 1159 |     explicit module_(const char *name, const char *doc = nullptr) {
+      |              ^~~~~~~
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: Warning: File 'CMakeFiles/SampleProject.dir/flags.make' has modification time 51 s in the future
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: Warning: File 'CMakeFiles/SampleProject.dir/flags.make' has modification time 51 s in the future
+In file included from /home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/types.h:58,
+                 from /home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/utils.h:48,
+                 from /home/weitong/code/1030/magsac/examples/cpp_example.cpp:16:
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/estimators/solver_radial_homography_5pc.h: In static member function 'static constexpr char* gcransac::estimator::solver::RadialHomography5PC::getName()':
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/estimators/solver_radial_homography_5pc.h:82:13: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]
+   82 |      return "H5l1l2";
+      |             ^~~~~~~~
+In file included from /home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/types.h:59,
+                 from /home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/utils.h:48,
+                 from /home/weitong/code/1030/magsac/examples/cpp_example.cpp:16:
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/estimators/solver_radial_homography_6pc.h: In static member function 'static constexpr char* gcransac::estimator::solver::RadialHomography6PC::getName()':
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/estimators/solver_radial_homography_6pc.h:74:13: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]
+   74 |      return "H6l1l2";
+      |             ^~~~~~~~
+In file included from /home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/types.h:58,
+                 from /home/weitong/code/1030/magsac/src/pymagsac/src/magsac_python.cpp:5:
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/estimators/solver_radial_homography_5pc.h: In static member function 'static constexpr char* gcransac::estimator::solver::RadialHomography5PC::getName()':
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/estimators/solver_radial_homography_5pc.h:82:13: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]
+   82 |      return "H5l1l2";
+      |             ^~~~~~~~
+In file included from /home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/types.h:59,
+                 from /home/weitong/code/1030/magsac/src/pymagsac/src/magsac_python.cpp:5:
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/estimators/solver_radial_homography_6pc.h: In static member function 'static constexpr char* gcransac::estimator::solver::RadialHomography6PC::getName()':
+/home/weitong/code/1030/magsac/graph-cut-ransac/src/pygcransac/include/estimators/solver_radial_homography_6pc.h:74:13: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]
+   74 |      return "H6l1l2";
+      |             ^~~~~~~~
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake[1]: warning:  Clock skew detected.  Your build may be incomplete.
+gmake: warning:  Clock skew detected.  Your build may be incomplete.
+/home/weitong/.conda/envs/score/lib/python3.7/site-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+!!
+
+        ********************************************************************************
+        Please avoid running ``setup.py`` directly.
+        Instead, use pypa/build, pypa/installer or other
+        standards-based tools.
+
+        See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+        ********************************************************************************
+
+!!
+  self.initialize_options()
+/home/weitong/.conda/envs/score/lib/python3.7/site-packages/setuptools/_distutils/cmd.py:66: EasyInstallDeprecationWarning: easy_install command is deprecated.
+!!
+
+        ********************************************************************************
+        Please avoid running ``setup.py`` and ``easy_install``.
+        Instead, use pypa/build, pypa/installer or other
+        standards-based tools.
+
+        See https://github.com/pypa/setuptools/issues/917 for details.
+        ********************************************************************************
+
+!!
+  self.initialize_options()

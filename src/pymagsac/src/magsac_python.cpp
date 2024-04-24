@@ -15,8 +15,8 @@
 #include "samplers/gumbel_softmax_sampler.h"
 #include <thread>
 
-#include <gflags/gflags.h>
-#include <glog/logging.h>
+#include </home/weitong/.conda/envs/score/include/gflags/gflags.h>
+#include </home/weitong/.conda/envs/score/include/glog/logging.h>
 
 
 void optimizeEssentialMatrix_(

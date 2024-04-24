@@ -26,6 +26,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS "-fpermissive")
 set(CMAKE_C_FLAGS "-fPIC")
 set(CMAKE_CXX_FLAGS "-fPIC")
+
+set(pybind11_DIR /home/weitong/.local/lib/python3.8/site-packages/pybind11/share/cmake/pybind11)
+include_directories(/home/weitong/.local/lib/python3.8/site-packages/pybind11/include)
+find_package(pybind11 REQUIRED)
+# SET(PYBIND11_CPP_STANDARD "${PYBIND11_CPP_STANDARD} -std=c++17")
+set(PYBIND11_CPP_STANDARD "-std=c++17")
+
 # ==============================================================================
 # Find OpenCV
 # ==============================================================================
@@ -40,15 +47,15 @@ endif (OPENCV_FOUND)
 # Find GFlags
 # ==============================================================================
 find_package(gflags REQUIRED)
-if(DEFINED gflags_VERSION_STRING OR DEFINED GFLAGS_VERSION_STRING)
-	# different cmake variable with lower or upper case exist
-	set(GFLAGS_INCLUDE_DIR ${GFLAGS_INCLUDE_DIR})
-	set(GFLAGS_LIBRARIES ${GFLAGS_LIBRARIES})
-  message( "Found Gflags ${GFLAGS_VERSION_STRING}" )
-  message( STATUS "> GFLAGS_INCLUDE_DIR:   ${GFLAGS_INCLUDE_DIR}" )
-  message( STATUS "> GFLAGS_LIBRARIES:   ${GFLAGS_LIBRARIES}" )
-endif()
-
+# if(DEFINED gflags_VERSION_STRING OR DEFINED GFLAGS_VERSION_STRING)
+# 	# different cmake variable with lower or upper case exist
+# 	set(GFLAGS_INCLUDE_DIR ${GFLAGS_INCLUDE_DIR})
+# 	set(GFLAGS_LIBRARIES ${GFLAGS_LIBRARIES})
+#   message( "Found Gflags ${GFLAGS_VERSION_STRING}" )
+#   message( STATUS "> GFLAGS_INCLUDE_DIR:   ${GFLAGS_INCLUDE_DIR}" )
+#   message( STATUS "> GFLAGS_LIBRARIES:   ${GFLAGS_LIBRARIES}" )
+# endif()
+include_directories(/home/weitong/.conda/envs/score/include/)
 # ==============================================================================
 # Find GLOG
 # ==============================================================================
